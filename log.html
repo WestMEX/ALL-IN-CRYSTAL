@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICONIQ Hats Studio – Panel de Escaneos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --bg:#07080c; --card:#13151f; --border:#1f2235; --gold:#c9974a; --gold2:#e8be7a; --green:#2ecc8f; --red:#e05555; --text:#dde0ec; --muted:#5a5d78; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding:2rem 1rem 4rem; }
+    body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 80% 40% at 50% 0%, rgba(201,151,74,.1) 0%, transparent 55%); pointer-events:none; }
+    .container { max-width:580px; margin:0 auto; position:relative; }
+    .header { text-align:center; margin-bottom:2rem; }
+    .logo-line { display:flex; align-items:center; justify-content:center; gap:.7rem; margin-bottom:.3rem; }
+    .logo-line::before { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold)); }
+    .logo-line::after  { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--gold),transparent); }
+    .brand { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; letter-spacing:4px; text-transform:uppercase; background:linear-gradient(135deg,var(--gold),var(--gold2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .tagline { font-size:.66rem; letter-spacing:4px; text-transform:uppercase; color:var(--muted); }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem; margin-bottom:1.5rem; }
+    .stat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem .8rem; text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:900; background:linear-gradient(135deg,var(--gold),var(--gold2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+    .stat-num.green { background:none; -webkit-text-fill-color:var(--green); }
+    .stat-num.red   { background:none; -webkit-text-fill-color:var(--red); }
+    .stat-label { font-size:.68rem; letter-spacing:1px; color:var(--muted); margin-top:.3rem; text-transform:uppercase; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:.9rem; }
+    .toolbar-left { font-size:.78rem; color:var(--muted); }
+    .live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); animation:blink 1.5s infinite; margin-right:5px; vertical-align:middle; }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .btn-clear { background:none; border:1px solid var(--border); color:var(--muted); padding:.35rem .8rem; border-radius:8px; cursor:pointer; font-size:.75rem; font-family:'DM Sans',sans-serif; transition:.2s; }
+    .btn-clear:hover { border-color:var(--red); color:var(--red); }
+    .empty { text-align:center; padding:3rem 1rem; color:var(--muted); font-size:.88rem; border:1px dashed var(--border); border-radius:14px; }
+    .log-item { display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:1rem; padding:.95rem 1.1rem; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:.6rem; animation:slideIn .3s ease; }
+    @keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+    .log-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .log-dot.ok   { background:var(--green); box-shadow:0 0 7px var(--green); }
+    .log-dot.fail { background:var(--red);   box-shadow:0 0 7px var(--red); }
+    .log-modelo { font-weight:700; font-size:.88rem; margin-bottom:.15rem; }
+    .log-meta   { font-size:.73rem; color:var(--muted); }
+    .log-badge { font-size:.72rem; font-weight:700; padding:.25rem .65rem; border-radius:6px; white-space:nowrap; }
+    .log-badge.ok   { background:rgba(46,204,143,.12); color:var(--green); }
+    .log-badge.fail { background:rgba(224,85,85,.12);  color:var(--red); }
+    .refresh-note { text-align:center; margin-top:1.2rem; font-size:.72rem; color:var(--muted); }
+    .back-link { display:block; text-align:center; margin-top:1rem; padding:.7rem; border:1px solid var(--border); border-radius:10px; font-size:.78rem; color:var(--muted); text-decoration:none; transition:.2s; }
+    .back-link:hover { border-color:var(--gold); color:var(--gold2); }
+    .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) scale(.9); background:var(--green); color:#07080c; font-weight:700; font-size:.82rem; padding:.65rem 1.4rem; border-radius:999px; box-shadow:0 4px 20px rgba(46,204,143,.35); opacity:0; transition:.3s; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) scale(1); }
+    .spinner { width:28px; height:28px; border:2px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .7s linear infinite; margin:2rem auto; }
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo-line"><span class="brand">ICONIQ</span></div>
+    <div class="tagline">Hats Studio &nbsp;·&nbsp; Panel de Escaneos</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total</div></div>
+    <div class="stat"><div class="stat-num green" id="statOk">—</div><div class="stat-label">Originales</div></div>
+    <div class="stat"><div class="stat-num red" id="statFail">—</div><div class="stat-label">No válidos</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="toolbar-left"><span class="live-dot"></span> En vivo · actualiza cada 8 seg</div>
+    <button class="btn-clear" onclick="limpiar()">🗑 Limpiar</button>
+  </div>
+  <div id="logContainer"><div class="spinner"></div></div>
+  <div class="refresh-note" id="lastUpdate">Cargando…</div>
+  <a class="back-link" href="index.html">← Volver a verificación</a>
+</div>
+<div class="toast" id="toast">🔔 ¡Nuevo escaneo detectado!</div>
+
+<script>
+// ════════════════════════════════════════════════
+const JSONBIN_BIN_ID  = "69b7b2deb7ec241ddc717998";
+const JSONBIN_API_KEY = "TU_API_KEY_AQUI";
+// ════════════════════════════════════════════════
+const API     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const HEADERS = { "X-Master-Key": JSONBIN_API_KEY };
+let ultimoTotal = -1;
+
+async function cargar() {
+  try {
+    const r    = await fetch(API + "/latest", { headers: HEADERS });
+    const data = await r.json();
+    const logs = (data.record && data.record.escaneos) ? data.record.escaneos : [];
+    const total = logs.length;
+    const ok    = logs.filter(l => l.resultado && l.resultado.includes("Original")).length;
+    document.getElementById("statTotal").textContent = total;
+    document.getElementById("statOk").textContent    = ok;
+    document.getElementById("statFail").textContent  = total - ok;
+    document.getElementById("lastUpdate").textContent = `Última actualización: ${new Date().toLocaleTimeString("es-MX")}`;
+    if (ultimoTotal !== -1 && total > ultimoTotal) mostrarToast();
+    ultimoTotal = total;
+    const container = document.getElementById("logContainer");
+    if (total === 0) { container.innerHTML = '<div class="empty">Aún no hay escaneos registrados.</div>'; return; }
+    container.innerHTML = logs.map(log => {
+      const esOk = log.resultado && log.resultado.includes("Original");
+      return `<div class="log-item">
+        <div class="log-dot ${esOk?'ok':'fail'}"></div>
+        <div>
+          <div class="log-modelo">${log.modelo || "Desconocido"}</div>
+          <div class="log-meta">${log.fecha || "—"} &nbsp;·&nbsp; <span style="font-family:monospace;font-size:.68rem">${log.id||""}</span></div>
+        </div>
+        <div class="log-badge ${esOk?'ok':'fail'}">${log.resultado||"—"}</div>
+      </div>`;
+    }).join('');
+  } catch {
+    document.getElementById("logContainer").innerHTML = '<div class="empty">⚠️ Error al cargar. Verifica tu API Key.</div>';
+  }
+}
+
+async function limpiar() {
+  if (!confirm("¿Borrar todos los registros?")) return;
+  try {
+    await fetch(API, { method:"PUT", headers:{...HEADERS,"Content-Type":"application/json"}, body:JSON.stringify({escaneos:[]}) });
+    ultimoTotal = 0; cargar();
+  } catch { alert("Error al limpiar"); }
+}
+
+function mostrarToast() {
+  const t = document.getElementById("toast");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 3500);
+}
+
+cargar();
+setInterval(cargar, 8000);
+</script>
+</body>
+</html>

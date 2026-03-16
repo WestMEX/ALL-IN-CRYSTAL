@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICONIQ Hats Studio – Verificación</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --bg:#07080c; --card:#13151f; --border:#1f2235; --gold:#c9974a; --gold2:#e8be7a; --green:#2ecc8f; --red:#e05555; --text:#dde0ec; --muted:#5a5d78; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem 1rem; }
+    body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,151,74,.12) 0%, transparent 60%); pointer-events:none; }
+    .wrapper { position:relative; width:100%; max-width:420px; }
+    .header { text-align:center; margin-bottom:1.8rem; animation:fadeDown .6s ease both; }
+    .logo-line { display:flex; align-items:center; justify-content:center; gap:.7rem; margin-bottom:.3rem; }
+    .logo-line::before { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--gold)); }
+    .logo-line::after  { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--gold),transparent); }
+    .brand { font-family:'Playfair Display',serif; font-size:1.65rem; font-weight:900; letter-spacing:4px; text-transform:uppercase; background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; white-space:nowrap; }
+    .tagline { font-size:.68rem; letter-spacing:5px; text-transform:uppercase; color:var(--muted); }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.5); animation:fadeUp .6s .1s ease both; }
+    .card-top-bar { height:3px; background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold2) 60%,transparent); }
+    .card-body { padding:2rem 1.8rem; }
+    .nfc-wrap { display:flex; justify-content:center; margin-bottom:1.8rem; }
+    .nfc-anim { position:relative; width:76px; height:76px; }
+    .ring { position:absolute; border:1.5px solid var(--gold); border-radius:50%; opacity:0; animation:ripple 2s ease-out infinite; }
+    .ring:nth-child(1){inset:0;animation-delay:0s} .ring:nth-child(2){inset:10px;animation-delay:.5s} .ring:nth-child(3){inset:20px;animation-delay:1s}
+    .nfc-core { position:absolute; inset:26px; background:linear-gradient(135deg,var(--gold),var(--gold2)); border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    @keyframes ripple{0%{transform:scale(.5);opacity:.6}100%{transform:scale(1.5);opacity:0}}
+    .status-box { border-radius:12px; padding:1.3rem 1.2rem; text-align:center; border:1px solid var(--border); background:rgba(255,255,255,.02); transition:all .4s ease; margin-bottom:1.4rem; }
+    .status-box.ok   { background:rgba(46,204,143,.07); border-color:rgba(46,204,143,.3); }
+    .status-box.fail { background:rgba(224,85,85,.07);  border-color:rgba(224,85,85,.3); }
+    .status-title { font-family:'Playfair Display',serif; font-size:1.3rem; letter-spacing:2px; margin-bottom:.3rem; display:flex; align-items:center; justify-content:center; gap:.5rem; }
+    .status-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+    .ok .status-dot   { background:var(--green); box-shadow:0 0 8px var(--green); }
+    .fail .status-dot { background:var(--red);   box-shadow:0 0 8px var(--red); }
+    .status-sub { font-size:.82rem; color:var(--muted); line-height:1.5; }
+    .scan-count-badge { display:none; align-items:center; justify-content:center; gap:.5rem; padding:.7rem 1rem; background:rgba(201,151,74,.08); border:1px solid rgba(201,151,74,.2); border-radius:10px; font-size:.8rem; color:var(--gold2); margin-bottom:1.4rem; }
+    .scan-count-badge.show { display:flex; }
+    .scan-count-badge strong { font-size:1.1rem; }
+    .info-grid { display:none; flex-direction:column; gap:.55rem; margin-bottom:1.4rem; }
+    .info-grid.show { display:flex; }
+    .info-row { display:flex; justify-content:space-between; align-items:center; padding:.6rem .9rem; background:rgba(255,255,255,.025); border-radius:9px; font-size:.82rem; }
+    .info-label { color:var(--muted); } .info-val { font-weight:700; } .info-val.accent { color:var(--gold2); }
+    .loader { display:flex; justify-content:center; gap:5px; margin:.4rem 0; }
+    .loader span { width:6px; height:6px; border-radius:50%; background:var(--gold); animation:dot .9s infinite ease-in-out; }
+    .loader span:nth-child(2){animation-delay:.2s} .loader span:nth-child(3){animation-delay:.4s}
+    @keyframes dot{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+    .footer { text-align:center; padding:1rem; font-size:.68rem; letter-spacing:2px; color:var(--muted); border-top:1px solid var(--border); text-transform:uppercase; }
+    .log-btn { display:block; text-align:center; margin-top:1.2rem; padding:.75rem; border:1px solid var(--border); border-radius:10px; font-size:.8rem; color:var(--muted); text-decoration:none; transition:.2s; background:var(--card); animation:fadeUp .6s .2s ease both; }
+    .log-btn:hover { border-color:var(--gold); color:var(--gold2); }
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+    @keyframes fadeUp  {from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="logo-line"><span class="brand">ICONIQ</span></div>
+    <div class="tagline">Hats Studio &nbsp;·&nbsp; Autenticidad Verificada</div>
+  </div>
+  <div class="card">
+    <div class="card-top-bar"></div>
+    <div class="card-body">
+      <div class="nfc-wrap">
+        <div class="nfc-anim">
+          <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+          <div class="nfc-core">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#07080c" stroke-width="2.5" stroke-linecap="round">
+              <path d="M5 12.5C5 8.36 8.36 5 12.5 5"/><path d="M2 12.5C2 6.7 6.7 2 12.5 2"/><path d="M8 12.5C8 10.02 10.02 8 12.5 8"/>
+              <circle cx="12.5" cy="12.5" r="2" fill="#07080c" stroke="none"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="status-box" id="statusBox">
+        <div class="status-title" id="statusTitle"><div class="loader"><span></span><span></span><span></span></div></div>
+        <div class="status-sub" id="statusSub">Verificando autenticidad…</div>
+      </div>
+      <div class="scan-count-badge" id="scanBadge">
+        📊 Esta gorra ha sido escaneada <strong id="scanCountNum">0</strong> veces
+      </div>
+      <div class="info-grid" id="infoGrid">
+        <div class="info-row"><span class="info-label">Marca</span><span class="info-val accent">ICONIQ Hats Studio</span></div>
+        <div class="info-row"><span class="info-label">Modelo</span><span class="info-val" id="modelName">—</span></div>
+        <div class="info-row"><span class="info-label">ID del Tag</span><span class="info-val" id="tagIdEl">—</span></div>
+        <div class="info-row"><span class="info-label">Escaneado el</span><span class="info-val" id="scanTimeEl">—</span></div>
+      </div>
+    </div>
+    <div class="footer">ICONIQ Hats Studio &nbsp;©&nbsp; Autenticidad garantizada</div>
+  </div>
+  <a class="log-btn" href="log.html">📋 Ver registro de escaneos →</a>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  ⚙️  CONFIGURACIÓN — pon tus datos aquí
+// ════════════════════════════════════════════════════════════════
+const JSONBIN_BIN_ID  = "69b7b2deb7ec241ddc717998";
+const JSONBIN_API_KEY = "TU_API_KEY_AQUI";
+
+// Gorras registradas
+// IMPORTANTE: el "h" que va en la URL del chip es: sha256(id + secret)
+// Usa la página generador.html para obtener el "h" correcto de cada gorra
+// La URL que grabas en el chip es SIEMPRE la misma (no cambia):
+//   https://westmex.github.io/ALL-IN-CRYSTAL/index.html?id=g001&h=XXXXXXXXXX
+const TAGS = {
+  "g001": { modelo: "All-In Crystal (TEST)", secret: "xK9#mP2@qL7s" },
+  // "g002": { modelo: "Otro Modelo",           secret: "rT3!bN8@kW2p" },
+};
+// ════════════════════════════════════════════════════════════════
+
+const API     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const HEADERS = { "Content-Type": "application/json", "X-Master-Key": JSONBIN_API_KEY };
+
+const params    = new URLSearchParams(window.location.search);
+const tagId     = params.get("id");
+const hashParam = params.get("h");
+
+// SHA-256 nativo del navegador (sin librerías)
+async function sha256(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("").slice(0, 20);
+}
+
+async function verificar() {
+  // 1. ¿Vienen los parámetros necesarios?
+  if (!tagId || !hashParam) {
+    mostrarFail("Acceso no válido 🚫", "Esta página solo puede abrirse escaneando el chip NFC de la gorra. No se puede acceder escribiendo la URL.");
+    return;
+  }
+
+  // 2. ¿Existe la gorra?
+  const tag = TAGS[tagId];
+  if (!tag) {
+    await guardar(tagId, "Desconocido", false, "ID no registrado");
+    mostrarFail("Tag no registrado ⚠️", "Este producto no está en nuestro sistema. Puede ser una imitación.");
+    return;
+  }
+
+  // 3. Verificar el hash: sha256(id + secret)
+  //    Solo quien conozca el secret puede calcular el hash correcto.
+  //    Aunque vean la URL, sin el secret no pueden generar un hash válido para otra gorra.
+  const hashEsperado = await sha256(tagId + tag.secret);
+  if (hashParam !== hashEsperado) {
+    await guardar(tagId, tag.modelo, false, "Hash inválido");
+    mostrarFail("Verificación fallida 🔒", "Los datos del chip no coinciden. Este tag puede ser una copia no autorizada.");
+    return;
+  }
+
+  // ✅ Hash válido → es original
+  const total = await guardar(tagId, tag.modelo, true, "OK");
+  mostrarOK(tag.modelo, tagId, total);
+}
+
+async function guardar(id, modelo, esOriginal, motivo) {
+  try {
+    const r    = await fetch(API + "/latest", { headers: HEADERS });
+    const data = await r.json();
+    const db   = (data.record && data.record.escaneos) ? data.record : { escaneos: [] };
+
+    const ahora = new Date().toLocaleString("es-MX", {
+      day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
+    });
+
+    db.escaneos.unshift({
+      id, modelo,
+      resultado: esOriginal ? "Original ✅" : `No válido ⚠️ (${motivo})`,
+      fecha: ahora
+    });
+    if (db.escaneos.length > 300) db.escaneos.pop();
+
+    await fetch(API, { method:"PUT", headers:HEADERS, body:JSON.stringify(db) });
+    return db.escaneos.filter(e => e.id === id && e.resultado.includes("Original")).length;
+  } catch(e) { console.error(e); return "—"; }
+}
+
+function mostrarOK(modelo, id, total) {
+  const ahora = new Date().toLocaleString("es-MX", {
+    day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
+  });
+  document.getElementById("statusBox").className   = "status-box ok";
+  document.getElementById("statusTitle").innerHTML = '<div class="status-dot"></div> ORIGINAL VERIFICADO';
+  document.getElementById("statusSub").textContent = "✅ Producto 100% auténtico de ICONIQ Hats Studio.";
+  document.getElementById("modelName").textContent  = modelo;
+  document.getElementById("tagIdEl").textContent    = id;
+  document.getElementById("scanTimeEl").textContent = ahora;
+  document.getElementById("infoGrid").classList.add("show");
+  document.getElementById("scanCountNum").textContent = total;
+  document.getElementById("scanBadge").classList.add("show");
+}
+
+function mostrarFail(titulo, desc) {
+  document.getElementById("statusBox").className   = "status-box fail";
+  document.getElementById("statusTitle").innerHTML = '<div class="status-dot"></div> ' + titulo;
+  document.getElementById("statusSub").textContent = desc;
+}
+
+verificar();
+</script>
+</body>
+</html>
