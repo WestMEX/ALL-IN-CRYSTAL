@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All-In Crystal – Verificación</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050508;
+      --surface: #0f0f18;
+      --border: #1e1e30;
+      --gold: #d4a853;
+      --gold2: #f0c96a;
+      --green: #3dffa0;
+      --red: #ff4f4f;
+      --text: #e8e8f0;
+      --muted: #6b6b88;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* ── fondo animado ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(212,168,83,.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(61,255,160,.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .wrapper {
+      position: relative;
+      width: 92%;
+      max-width: 440px;
+      padding: 2.5rem 2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 0 60px rgba(212,168,83,.06), 0 20px 60px rgba(0,0,0,.6);
+      text-align: center;
+    }
+
+    /* línea dorada superior */
+    .wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      border-radius: 999px;
+    }
+
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: .25rem;
+    }
+
+    .subtitle {
+      font-size: .78rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    /* ── icono NFC animado ── */
+    .nfc-icon {
+      width: 90px; height: 90px;
+      margin: 0 auto 1.8rem;
+      position: relative;
+    }
+    .nfc-icon svg { width: 100%; height: 100%; }
+    .nfc-ring {
+      animation: ping 1.8s ease-out infinite;
+      transform-origin: 50% 50%;
+      opacity: 0;
+    }
+    .nfc-ring:nth-child(2) { animation-delay: .5s; }
+    .nfc-ring:nth-child(3) { animation-delay: 1s; }
+    @keyframes ping {
+      0%   { opacity: .7; transform: scale(.6); }
+      100% { opacity: 0;  transform: scale(1.4); }
+    }
+
+    /* ── tarjeta de estado ── */
+    .status-card {
+      border-radius: 12px;
+      padding: 1.4rem 1.2rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      transition: all .4s ease;
+    }
+    .status-card.loading { background: rgba(255,255,255,.03); }
+    .status-card.ok      { background: rgba(61,255,160,.06); border-color: rgba(61,255,160,.25); }
+    .status-card.fake    { background: rgba(255,79,79,.06);  border-color: rgba(255,79,79,.25); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      margin-bottom: .4rem;
+    }
+    .badge-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ok .badge-dot   { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .fake .badge-dot { background: var(--red);   box-shadow: 0 0 8px var(--red);   }
+
+    .status-desc {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── info del producto ── */
+    .product-info {
+      display: none;
+      text-align: left;
+      gap: .6rem;
+      flex-direction: column;
+    }
+    .product-info.visible { display: flex; }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .83rem;
+      padding: .5rem .7rem;
+      background: rgba(255,255,255,.03);
+      border-radius: 8px;
+    }
+    .info-label { color: var(--muted); }
+    .info-value { font-weight: 700; color: var(--text); }
+    .info-value.gold { color: var(--gold); }
+
+    /* ── footer ── */
+    .footer {
+      margin-top: 1.8rem;
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── loading dots ── */
+    .dots span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: bounce .9s infinite ease-in-out;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes bounce {
+      0%,80%,100% { transform: scale(0); }
+      40%          { transform: scale(1); }
+    }
+
+    /* ── scan log (para admin) ── */
+    .log-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: .72rem;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--border);
+    }
+    .log-link:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="brand">ALL-IN CRYSTAL</div>
+  <div class="subtitle">Verificación de Autenticidad</div>
+
+  <!-- Icono NFC animado -->
+  <div class="nfc-icon">
+    <svg viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle class="nfc-ring" cx="45" cy="45" r="38" stroke="#d4a853" stroke-width="1.5"/>
+      <circle class="nfc-ring" cx="45" cy="45" r="28" stroke="#d4a853" stroke-width="1.5"/>
+      <circle class="nfc-ring" cx="45" cy="45" r="18" stroke="#d4a853" stroke-width="1.5"/>
+      <!-- chip central -->
+      <rect x="33" y="33" width="24" height="24" rx="5" fill="#d4a853" opacity=".15" stroke="#d4a853" stroke-width="1.5"/>
+      <path d="M40 45h10M45 40v10" stroke="#d4a853" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- Tarjeta de estado (cambia según resultado) -->
+  <div class="status-card loading" id="statusCard">
+    <div class="status-badge" id="statusBadge">
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="status-desc" id="statusDesc">Verificando tag NFC…</div>
+  </div>
+
+  <!-- Info del producto (aparece si es original) -->
+  <div class="product-info" id="productInfo">
+    <div class="info-row">
+      <span class="info-label">Modelo</span>
+      <span class="info-value gold">All-In Crystal (TEST)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Estado</span>
+      <span class="info-value">✅ Original Verificado</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">ID del Tag</span>
+      <span class="info-value" id="tagIdDisplay">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Escaneado</span>
+      <span class="info-value" id="scanTime">—</span>
+    </div>
+  </div>
+
+  <div class="footer">Powered by All-In Crystal™ Auth System</div>
+
+  <!-- Link al log (para que tu amigo vea los escaneos) -->
+  <a class="log-link" href="log.html">Ver registro de escaneos →</a>
+</div>
+
+<script>
+  // ══════════════════════════════════════════════
+  //  CONFIGURACIÓN — solo cambia estos valores
+  // ══════════════════════════════════════════════
+  const TAGS_VALIDOS = [
+    "gorra-allin-001",   // <-- el ID que programes en el NFC
+    "gorra-allin-002",   // puedes agregar más IDs aquí
+  ];
+  // ══════════════════════════════════════════════
+
+  // Lee el parámetro ?id=XXX de la URL
+  const params  = new URLSearchParams(window.location.search);
+  const tagId   = params.get("id");
+
+  const card    = document.getElementById("statusCard");
+  const badge   = document.getElementById("statusBadge");
+  const desc    = document.getElementById("statusDesc");
+  const info    = document.getElementById("productInfo");
+  const tagDisp = document.getElementById("tagIdDisplay");
+  const timeEl  = document.getElementById("scanTime");
+
+  // Simula un pequeño delay de "verificando"
+  setTimeout(() => {
+
+    if (!tagId) {
+      // No viene ningún ID → acceso directo sin NFC
+      card.className = "status-card fake";
+      badge.innerHTML = '<div class="badge-dot"></div> SIN TAG';
+      desc.textContent = "No se detectó ningún tag NFC. Escanea la gorra para verificar.";
+      return;
+    }
+
+    const esOriginal = TAGS_VALIDOS.includes(tagId);
+    const ahora = new Date().toLocaleString("es-MX", {
+      day:"2-digit", month:"short", year:"numeric",
+      hour:"2-digit", minute:"2-digit"
+    });
+
+    if (esOriginal) {
+      card.className = "status-card ok";
+      badge.innerHTML = '<div class="badge-dot"></div> ORIGINAL';
+      desc.textContent = "✅ Tag verificado correctamente. Este producto es auténtico.";
+      info.classList.add("visible");
+      tagDisp.textContent = tagId;
+      timeEl.textContent  = ahora;
+
+      // Guarda en localStorage para el log (lo lee log.html)
+      guardarLog(tagId, ahora, "ORIGINAL ✅");
+
+    } else {
+      card.className = "status-card fake";
+      badge.innerHTML = '<div class="badge-dot"></div> NO VÁLIDO';
+      desc.textContent = "⚠️ Este tag no está registrado. Puede ser una imitación o estar sin activar.";
+      guardarLog(tagId || "desconocido", ahora, "NO VÁLIDO ⚠️");
+    }
+
+  }, 1800); // 1.8 segundos de "verificando"
+
+  function guardarLog(id, tiempo, resultado) {
+    const logs = JSON.parse(localStorage.getItem("nfc_logs") || "[]");
+    logs.unshift({ id, tiempo, resultado });
+    if (logs.length > 50) logs.pop(); // máximo 50 registros
+    localStorage.setItem("nfc_logs", JSON.stringify(logs));
+  }
+</script>
+
+</body>
+</html>
